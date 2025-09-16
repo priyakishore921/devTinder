@@ -8,6 +8,7 @@ app.use(express.json());
 
 app.post('/signup', async (req, res) => {
     const user = new User(req.body);
+    console.log(req.body);
 
     // persist the user in db
     try {
@@ -15,6 +16,60 @@ app.post('/signup', async (req, res) => {
         res.status(201).send("User succesfully created");
     } catch (err) {
         res.status(400).send("Error saving the user", err);
+    }
+});
+
+
+// find user by email
+app.get('/user', async (req, res) => {
+    console.log(req.query);
+    const user = await User.findOne({ email: req.query.email });
+    console.log(user);
+    try {
+        if(!user) {
+            res.status(404).send("User not found");
+        }
+        res.send(user);
+    }
+    catch (err) {
+        res.status(500).send("Error fetching the user", err);
+    }
+});
+
+// get all the users from the db
+app.get('/feed', async (req, res) => {
+    try{
+        const users = await User.find({});
+        if(!users.length) {
+            res.status(500).send("No users found");
+        }
+        else {
+            res.send(users);
+        }
+    } catch(err) {
+        res.status(500).send("Error fetching users", err);
+    }
+});
+
+//delete usre by id
+app.delete('/user', async (req, res) => {
+    try {
+        const userId = req.query.id;
+        await User.findByIdAndDelete(userId);
+        res.send("User deleted successfully");
+    } catch (err) {
+        res.status(500).send("Error deleting the user", err);
+    }
+});
+
+//update data of a  user
+app.patch('/user', async (req, res) => {
+    const data = req.body;
+    try{
+        const user = await User.findByIdAndUpdate(req.query.id, data);
+        res.send("User updated successfully");
+    } catch(err) {
+        res.status(500).send("Error updating the user", err);
     }
 });
 
