@@ -65,8 +65,18 @@ app.delete('/user', async (req, res) => {
 //update data of a  user
 app.patch('/user', async (req, res) => {
     const data = req.body;
+    // update user by id
+    // try{
+    //     const user = await User.findByIdAndUpdate(req.query.id, data);
+    //     res.send("User updated successfully");
+    // } catch(err) {
+    //     res.status(500).send("Error updating the user", err);
+    // }
+
+    // update user by email
     try{
-        const user = await User.findByIdAndUpdate(req.query.id, data);
+        const email = req.body.email;
+        await User.findOneAndUpdate({email: email}, req.body);
         res.send("User updated successfully");
     } catch(err) {
         res.status(500).send("Error updating the user", err);
