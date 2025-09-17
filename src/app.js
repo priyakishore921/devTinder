@@ -15,7 +15,7 @@ app.post('/signup', async (req, res) => {
         await user.save();
         res.status(201).send("User succesfully created");
     } catch (err) {
-        res.status(400).send("Error saving the user", err);
+        res.status(400).send("Error saving the user"+ err.message);
     }
 });
 
@@ -63,24 +63,32 @@ app.delete('/user', async (req, res) => {
 });
 
 //update data of a  user
-app.patch('/user', async (req, res) => {
+app.patch('/user/:userId', async (req, res) => {
+    const userId = req.params.userId;
     const data = req.body;
-    // update user by id
-    // try{
-    //     const user = await User.findByIdAndUpdate(req.query.id, data);
-    //     res.send("User updated successfully");
-    // } catch(err) {
-    //     res.status(500).send("Error updating the user", err);
-    // }
-
-    // update user by email
+    //update user by id
     try{
-        const email = req.body.email;
-        await User.findOneAndUpdate({email: email}, req.body);
+
+        const ALLOWED_UPDATES = ['password', 'age', 'skills', 'about', 'profileUrl'];
+        const requestedUpdates = Object.keys(data);
+        const isValidOperation = requestedUpdates.every((update) => ALLOWED_UPDATES.includes(update));
+        if(!isValidOperation) {
+            return res.status(400).send({ error: 'Invalid updates!' });
+        }
+        const user = await User.findByIdAndUpdate(userId, data);
         res.send("User updated successfully");
     } catch(err) {
         res.status(500).send("Error updating the user", err);
     }
+
+    // update user by email
+    // try{
+    //     const email = req.body.email;
+    //     await User.findOneAndUpdate({email: email}, req.body);
+    //     res.send("User updated successfully");
+    // } catch(err) {
+    //     res.status(500).send("Error updating the user", err);
+    // }
 });
 
 connectDB().then(() => {
