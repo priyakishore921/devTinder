@@ -35,13 +35,12 @@ app.post('/login', async (req, res) => {
             return res.status(404).send("Invalid email");
         }
 
-        const isPasswordMatch = await bcrypt.compare(password, user.password);
+        const isPasswordMatch = user.validatePassword(password);
         if(!isPasswordMatch) {
             return res.status(400).send("Invalid credentials");
         }
 
-        // create a jwt token and send it to user as cookie
-        const token = jwt.sign({_id: user._id}, "FirstJWTSecret", expiresIn='7h');
+        const token = await user.getJWT();
 
         res.cookie("token", token, {expires: new Date(Date.now() + 7*3600000), httpOnly: true});
         res.send("User logged in successfully");

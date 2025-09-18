@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt'); 
 
 const { Schema, model } = mongoose;
 
@@ -69,6 +71,19 @@ const userSchema = new Schema({
         default: "https://example.com/default-profile.png",
     }
 }, { timestamps: true });
+
+userSchema.methods.getJWT = function() {
+    const user = this;
+    const token = jwt.sign({_id: user._id}, "FirstJWTSecret", {expiresIn: '7h'});
+
+    return token;
+}
+
+userSchema.methods.validatePassword = function(passwordInputByUSer) {
+    const user = this;
+    const passwordHash = user.password;
+    return bcrypt.compare(passwordInputByUSer, passwordHash);
+}
 
 const userModel = model("User", userSchema);
 module.exports = userModel;
