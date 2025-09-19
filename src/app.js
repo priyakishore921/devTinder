@@ -6,9 +6,12 @@ const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const { UserAuth } = require('./middlewares/auth');
 
-const authRouter = require('./routes/auth');
-const profileRouter = require('./routes/profile');
-const requestRouter = require('./routes/request');
+const {
+    authRouter,
+    profileRouter,
+    requestRouter
+} = require('./routes');
+
 
 const app = express();
 
