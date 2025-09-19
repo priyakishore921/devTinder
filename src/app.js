@@ -7,6 +7,8 @@ const jwt = require('jsonwebtoken');
 const { UserAuth } = require('./middlewares/auth');
 
 const authRouter = require('./routes/auth');
+const profileRouter = require('./routes/profile');
+const requestRouter = require('./routes/request');
 
 const app = express();
 
@@ -14,22 +16,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/', authRouter);
-
-app.get('/profile', UserAuth, async (req, res) => {
-    try {
-        const user = req.user;
-        res.send(user);
-    }
-    catch(err) {
-        res.status(500).send("Error fetching profile"+ err.message);
-    }
-});
-
-app.post('/connectionRequest', UserAuth, async (req, res) => {
-    console.log("Sending connection request");
-
-    res.send(`Connection request sent by ${req.user.firstName} `);
-});
+app.use('/', profileRouter);
+app.use('/', requestRouter);
 
 connectDB().then(() => {
    console.log("DB connected");
